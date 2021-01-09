@@ -1,12 +1,6 @@
 const fetch = require("./fetch");
 const store = require("./store");
-const util = require("util");
-const [,, player1, player2, player3] = process.argv;
-const players = [player1, player2, player3].filter(
-  (e) => typeof e !== "undefined"
-);
-
-async function main() {
+async function latestGame(players) {
   const time = Date.now();
   await store.load();
   for (const player of players) {
@@ -33,9 +27,13 @@ async function main() {
     const result = {
       playerId: game.userNum,
       gameId: game.gameId,
+      seasonId: game.seasonId,
       name: game.nickname,
+      rank: game.gameRank,
+      characterId: game.characterNum,
+      characterLevel: game.characterLevel,
       mmr: stat.mmr,
-      mmrDelta: stat.mmr - game.mmrBefore,
+      deltaMmr: stat.mmr - game.mmrBefore,
       mode: ((matchingTeamMode) => {
         switch (matchingTeamMode) {
           case 1:
@@ -46,6 +44,8 @@ async function main() {
             return "squad";
         }
       })(game.matchingTeamMode),
+      startedAt: game.startDtm,
+      playTime: game.playTime,
       totalTime: game.totalTime,
       gainExp: game.gainExp,
       kill: game.playerKill,
@@ -54,27 +54,33 @@ async function main() {
       weaponLevel: game.bestWeaponLevel,
       playerDeal: game.damageToPlayer,
       monsterDeal: game.damageToMonster,
-      trapDeal: game.trapDamage,
       killedBy: game.killDetail,
       killerDeal: await (async () => {
         if (game.killerUserNum !== 0) {
           const res = await fetch.user.games(game.killerUserNum);
           const killerGame = res.userGames.find(e => e.gameId === game.gameId);
-          return killerGame.damageToPlayer
+          if (killerGame) {
+            return killerGame.damageToPlayer
+          } else {
+            console.error(res);
+          }
         }
         return 0;
       })(),
       safeAreas: game.safeAreas,
-      causeOfDeath: game.causeOfDeath
+      causeOfDeath: game.causeOfDeath,
+      equipment: game.equipment
     };
     console.log(result);
     store.addGame(result);
   }
-  const state = store.getState();
   await store.save();
-  console.log(`${Date.now() - time}ms`);
+  const elapsedTime = Date.now() - time;
+  console.log(`${elapsedTime}ms`);
+  return {
+    elapsedTime, 
+    state: store.getState()
+  };
 }
 
-main()
-  .then((e) => console.log(e))
-  .catch((e) => console.error(e));
+module.exports = latestGame;

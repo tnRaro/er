@@ -1,0 +1,12 @@
+@font-face {
+  font-family: "Spoqa Han Sans";
+  font-weight: 700;
+  src: local("Spoqa Han Sans Bold"),
+    url("/f/SpoqaHanSansNeo-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Spoqa Han Sans";
+  font-weight: 400;
+  src: local("Spoqa Han Sans Regular"),
+    url("/f/SpoqaHanSansNeo-Regular.woff2") format("woff2");
+}
