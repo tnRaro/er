@@ -13,13 +13,11 @@ const GameGroup = (props) => {
       padding={4}
     >
       {props.games.map((game, index) => (
-        <>
-          <ResultCard
-            key={game.playerId}
-            hiddenGameInfo={index !== 0}
-            {...game}
-          />
-        </>
+        <ResultCard
+          key={game.playerId}
+          hiddenGameInfo={index !== 0}
+          {...game}
+        />
       ))}
     </Stack>
   );

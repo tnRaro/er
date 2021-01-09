@@ -5,7 +5,7 @@ const GameList = (props) => {
   return (
     <Stack direction="column">
       {props.games.map((games) => (
-        <GameGroup games={games} />
+        <GameGroup key={games[0].gameId} games={games} />
       ))}
     </Stack>
   );
